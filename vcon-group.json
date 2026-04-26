@@ -25,5 +25,20 @@
       "$ref": "vcon-schema.json#/$defs/ContentHash",
       "description": "Hash(es) of the externally referenced vCon content"
     }
-  }
+  },
+  "allOf": [
+    {
+      "not": { "required": ["body", "url"] }
+    },
+    {
+      "if": { "required": ["body"] },
+      "then": { "required": ["encoding"] },
+      "else": { "not": { "required": ["encoding"] } }
+    },
+    {
+      "if": { "required": ["url"] },
+      "then": { "required": ["content_hash"] },
+      "else": { "not": { "required": ["content_hash"] } }
+    }
+  ]
 }
