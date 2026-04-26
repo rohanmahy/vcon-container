@@ -1,0 +1,559 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.ietf.org/archive/id/draft-ietf-vcon-vcon-container",
+  "title": "vCon",
+  "description": "Virtual Conversation Container (unsigned form)",
+  "type": "object",
+  "required": ["vcon", "uuid", "created_at", "parties"],
+  "properties": {
+    "vcon": {
+      "type": "string",
+      "const": "0.0.2",
+      "description": "Syntactic version of the JSON format used in the vCon"
+    },
+    "uuid": {
+      "type": "string",
+      "description": "Globally unique identifier for the vCon"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation time of this vCon (RFC3339); MUST NOT change after creation"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last modified time of this vCon (RFC3339)"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Subject or topic of the conversation"
+    },
+    "redacted": {
+      "$ref": "#/$defs/RedactedObject",
+      "description": "Reference to the unredacted or prior less-redacted vCon instance version; mutually exclusive with appended and group"
+    },
+    "appended": {
+      "$ref": "#/$defs/AppendedObject",
+      "description": "Reference to the prior vCon instance version to which data has been appended; mutually exclusive with redacted and group"
+    },
+    "group": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/GroupObject" },
+      "description": "Array of Group Objects aggregating multiple vCons into a single conversation; mutually exclusive with redacted and appended"
+    },
+    "parties": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/PartyObject" },
+      "description": "Array of Party Objects for all parties involved in the conversation"
+    },
+    "dialog": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/DialogObject" },
+      "description": "Array of Dialog Objects containing the captured conversation"
+    },
+    "analysis": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/AnalysisObject" },
+      "description": "Array of Analysis Objects containing analysis performed on the conversation"
+    },
+    "attachments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/AttachmentObject" },
+      "description": "Array of Attachment Objects for ancillary documents related to the conversation"
+    }
+  },
+  "not": {
+    "anyOf": [
+      { "required": ["redacted", "appended"] },
+      { "required": ["redacted", "group"] },
+      { "required": ["appended", "group"] }
+    ]
+  },
+  "$defs": {
+    "ContentHash": {
+      "description": "Single hash token or array of hash tokens for externally referenced content",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
+    },
+    "RedactedObject": {
+      "type": "object",
+      "required": ["type"],
+      "description": "Reference to the unredacted or prior less-redacted vCon instance version",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "description": "UUID of the unredacted/prior vCon instance version; absence indicates that version is unavailable"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of redaction performed relative to the prior vCon instance version"
+        },
+        "body": {
+          "type": "string",
+          "description": "Inline content of the unredacted vCon; MUST be in encrypted form if included"
+        },
+        "encoding": {
+          "type": "string",
+          "enum": ["base64url", "json", "none"],
+          "description": "Encoding of the body parameter"
+        },
+        "url": {
+          "type": "string",
+          "description": "HTTPS URL of the unredacted vCon; access MUST be restricted to authorized parties"
+        },
+        "content_hash": {
+          "$ref": "#/$defs/ContentHash",
+          "description": "Hash(es) of the externally referenced unredacted vCon content"
+        }
+      }
+    },
+    "AppendedObject": {
+      "type": "object",
+      "description": "Reference to the prior vCon instance version to which additional data has been appended",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "description": "UUID of the original/prior vCon instance version"
+        },
+        "body": {
+          "type": "string",
+          "description": "Inline content of the prior vCon instance version"
+        },
+        "encoding": {
+          "type": "string",
+          "enum": ["base64url", "json", "none"],
+          "description": "Encoding of the body parameter"
+        },
+        "url": {
+          "type": "string",
+          "description": "HTTPS URL of the prior vCon instance version"
+        },
+        "content_hash": {
+          "$ref": "#/$defs/ContentHash",
+          "description": "Hash(es) of the externally referenced prior vCon instance content"
+        }
+      }
+    },
+    "GroupObject": {
+      "type": "object",
+      "description": "Includes or refers to a vCon to be aggregated into the whole of a single vCon conversation",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "description": "UUID of the referenced vCon to be aggregated"
+        },
+        "body": {
+          "description": "The JSON unsigned, JWS signed, or JWE encrypted form of the referenced vCon"
+        },
+        "encoding": {
+          "type": "string",
+          "const": "json",
+          "description": "Encoding of the vCon body; MUST be 'json'"
+        },
+        "url": {
+          "type": "string",
+          "description": "HTTPS URL of the externally referenced vCon"
+        },
+        "content_hash": {
+          "$ref": "#/$defs/ContentHash",
+          "description": "Hash(es) of the externally referenced vCon content"
+        }
+      }
+    },
+    "CivicaddressObject": {
+      "type": "object",
+      "description": "Civic address information for a party's location as defined in RFC4119 (GEOPRIV); all parameters in lower case",
+      "properties": {
+        "country": { "type": "string" },
+        "a1":      { "type": "string" },
+        "a2":      { "type": "string" },
+        "a3":      { "type": "string" },
+        "a4":      { "type": "string" },
+        "a5":      { "type": "string" },
+        "a6":      { "type": "string" },
+        "prd":     { "type": "string" },
+        "pod":     { "type": "string" },
+        "sts":     { "type": "string" },
+        "hno":     { "type": "string" },
+        "hns":     { "type": "string" },
+        "lmk":     { "type": "string" },
+        "loc":     { "type": "string" },
+        "flr":     { "type": "string" },
+        "nam":     { "type": "string" },
+        "pc":      { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "PartyObject": {
+      "type": "object",
+      "description": "Identity, contact information, and metadata for a party to the conversation",
+      "properties": {
+        "tel": {
+          "type": "string",
+          "description": "TEL URL for the party; 'tel:' scheme prefix is optional"
+        },
+        "stir": {
+          "type": "string",
+          "description": "PASSporT in JWS Compact Serialization form"
+        },
+        "mailto": {
+          "type": "string",
+          "description": "mailto URL for the party; 'mailto:' scheme prefix is optional"
+        },
+        "name": {
+          "type": "string",
+          "description": "Party's name (free-form)"
+        },
+        "validation": {
+          "type": "string",
+          "description": "Token identifying the method used to validate the party's identity; SHOULD be provided when name is provided"
+        },
+        "gmlpos": {
+          "type": "string",
+          "description": "GML pos format latitude and longitude of the party's location at conversation start (same format as gml:pos in RFC4119 PIDF)"
+        },
+        "civicaddress": {
+          "$ref": "#/$defs/CivicaddressObject"
+        },
+        "uuid": {
+          "type": "string",
+          "description": "Unique identifier for the participant; MUST be static across interactions for correlation"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role the participant played in the conversation (e.g. 'agent', 'customer', 'supervisor', 'sme', 'thirdparty')"
+        },
+        "contact_list": {
+          "type": "string",
+          "description": "Label or foreign key reference to the contact list this party was on"
+        }
+      }
+    },
+    "PartyHistoryObject": {
+      "type": "object",
+      "description": "Record of a join, drop, hold, or mute event for a party during a dialog",
+      "required": ["party", "event", "time"],
+      "properties": {
+        "party": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index into the parties array for the party this event applies to"
+        },
+        "event": {
+          "type": "string",
+          "enum": ["join", "drop", "hold", "unhold", "mute", "unmute"],
+          "description": "Type of party event"
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date and time of the event (RFC3339)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DialogObject": {
+      "type": "object",
+      "description": "A segment of captured conversation (text, audio, video, transfer record, or incomplete attempt)",
+      "required": ["type", "start"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["recording", "text", "transfer", "incomplete"],
+          "description": "Type of dialog segment"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date and time for the beginning of this dialog segment (RFC3339)"
+        },
+        "duration": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Duration in seconds of the dialog segment"
+        },
+        "parties": {
+          "description": "Index or indices of parties contributing to this dialog; for multi-channel recordings, an array whose elements are the party index or indices per channel",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  { "type": "integer", "minimum": 0 },
+                  { "type": "array", "items": { "type": "integer", "minimum": 0 } }
+                ]
+              }
+            }
+          ]
+        },
+        "originator": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index into the parties array for the party that originated this dialog; provided only when the first party listed is NOT the originator"
+        },
+        "mediatype": {
+          "type": "string",
+          "description": "MIME media type of the dialog content (e.g. 'audio/x-wav', 'text/plain', 'video/x-mp4')"
+        },
+        "filename": {
+          "type": "string",
+          "description": "Original filename of the dialog file"
+        },
+        "body": {
+          "type": "string",
+          "description": "Inline dialog content"
+        },
+        "encoding": {
+          "type": "string",
+          "enum": ["base64url", "json", "none"],
+          "description": "Encoding applied to the body parameter"
+        },
+        "url": {
+          "type": "string",
+          "description": "HTTPS URL where the externally referenced dialog file is stored"
+        },
+        "content_hash": {
+          "$ref": "#/$defs/ContentHash",
+          "description": "Hash(es) of the externally referenced dialog content"
+        },
+        "disposition": {
+          "type": "string",
+          "enum": ["no-answer", "congestion", "failed", "busy", "hung-up", "voicemail-no-message"],
+          "description": "Reason the call or conversation setup failed; REQUIRED for 'incomplete' type, SHOULD NOT be present for other types"
+        },
+        "party_history": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/PartyHistoryObject" },
+          "description": "History of party join/drop/hold/mute events during this dialog"
+        },
+        "transferee": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index into the parties array for the Transferee role; SHOULD be present for 'transfer' type"
+        },
+        "transferor": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index into the parties array for the Transferor role; SHOULD be present for 'transfer' type"
+        },
+        "transfer-target": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index into the parties array for the Transfer Target role; SHOULD be present for 'transfer' type"
+        },
+        "original": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index into the dialog array for the original dialog between Transferee and Transferor; SHOULD be present for 'transfer' type"
+        },
+        "consultation": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index into the dialog array for the consultative dialog between Transferor and Transfer Target; optional for 'transfer' type"
+        },
+        "target-dialog": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index into the dialog array for the target dialog between Transferee and Transfer Target; SHOULD be present for 'transfer' type"
+        },
+        "campaign": {
+          "type": "string",
+          "description": "Label or foreign key reference to the campaign this dialog is part of"
+        },
+        "interaction_type": {
+          "type": "string",
+          "description": "Type of interaction"
+        },
+        "interaction_id": {
+          "type": "string",
+          "description": "Label or foreign key reference to the interaction ID"
+        },
+        "skill": {
+          "type": "string",
+          "description": "Skill required to service this dialog in a contact center"
+        },
+        "application": {
+          "type": "string",
+          "description": "Application, communication channel, or context over which the conversation was held"
+        },
+        "message_id": {
+          "type": "string",
+          "description": "Unique message identifier assigned by the messaging system"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["type"],
+            "properties": { "type": { "const": "incomplete" } }
+          },
+          "then": {
+            "required": ["disposition"],
+            "not": {
+              "anyOf": [
+                { "required": ["body"] },
+                { "required": ["encoding"] },
+                { "required": ["url"] },
+                { "required": ["content_hash"] },
+                { "required": ["transferee"] },
+                { "required": ["transferor"] },
+                { "required": ["transfer-target"] },
+                { "required": ["original"] },
+                { "required": ["target-dialog"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["type"],
+            "properties": { "type": { "const": "transfer" } }
+          },
+          "then": {
+            "required": ["transferee", "transferor", "transfer-target", "original", "target-dialog"],
+            "not": {
+              "anyOf": [
+                { "required": ["parties"] },
+                { "required": ["originator"] },
+                { "required": ["mediatype"] },
+                { "required": ["filename"] },
+                { "required": ["body"] },
+                { "required": ["encoding"] },
+                { "required": ["url"] },
+                { "required": ["content_hash"] },
+                { "required": ["disposition"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["type"],
+            "properties": { "type": { "enum": ["recording", "text"] } }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                { "required": ["disposition"] },
+                { "required": ["transferee"] },
+                { "required": ["transferor"] },
+                { "required": ["transfer-target"] },
+                { "required": ["original"] },
+                { "required": ["target-dialog"] }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "AnalysisObject": {
+      "type": "object",
+      "description": "Analysis performed on the conversational data",
+      "required": ["type", "vendor"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Semantic type of analysis data (e.g. 'summary', 'transcript', 'translation', 'sentiment', 'tts')"
+        },
+        "dialog": {
+          "description": "Index or array of indices into the dialog array that this analysis was derived from",
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "array", "items": { "type": "integer", "minimum": 0 } }
+          ]
+        },
+        "mediatype": {
+          "type": "string",
+          "description": "MIME media type of the analysis file"
+        },
+        "filename": {
+          "type": "string",
+          "description": "Original filename of the analysis data file"
+        },
+        "vendor": {
+          "type": "string",
+          "description": "Vendor or product name of the software that generated the analysis"
+        },
+        "product": {
+          "type": "string",
+          "description": "Product name to differentiate from other products by the same vendor"
+        },
+        "schema": {
+          "type": "string",
+          "description": "Token or label for the data format or schema of the analysis data"
+        },
+        "body": {
+          "type": "string",
+          "description": "Inline analysis content"
+        },
+        "encoding": {
+          "type": "string",
+          "enum": ["base64url", "json", "none"],
+          "description": "Encoding applied to the body parameter"
+        },
+        "url": {
+          "type": "string",
+          "description": "HTTPS URL where the externally referenced analysis file is stored"
+        },
+        "content_hash": {
+          "$ref": "#/$defs/ContentHash",
+          "description": "Hash(es) of the externally referenced analysis content"
+        }
+      }
+    },
+    "AttachmentObject": {
+      "type": "object",
+      "description": "Ancillary document discussed, presented, referenced, or related to the conversation",
+      "required": ["start", "party", "dialog"],
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date and time the attachment was sent or exchanged (RFC3339)"
+        },
+        "party": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index into the parties array for the party that contributed the attachment"
+        },
+        "mediatype": {
+          "type": "string",
+          "description": "MIME media type of the attachment file"
+        },
+        "filename": {
+          "type": "string",
+          "description": "Original filename of the attachment file"
+        },
+        "body": {
+          "type": "string",
+          "description": "Inline attachment content"
+        },
+        "encoding": {
+          "type": "string",
+          "enum": ["base64url", "json", "none"],
+          "description": "Encoding applied to the body parameter"
+        },
+        "url": {
+          "type": "string",
+          "description": "HTTPS URL where the externally referenced attachment file is stored"
+        },
+        "content_hash": {
+          "$ref": "#/$defs/ContentHash",
+          "description": "Hash(es) of the externally referenced attachment content"
+        },
+        "dialog": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index into the dialog array identifying the dialog this attachment is part of"
+        }
+      }
+    }
+  }
+}
