@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vcon-group.json",
+  "title": "vCon Group Object",
+  "description": "Includes or refers to a vCon to be aggregated into the whole of a single vCon conversation",
+  "type": "object",
+  "properties": {
+    "uuid": {
+      "type": "string",
+      "description": "UUID of the referenced vCon to be aggregated"
+    },
+    "body": {
+      "description": "The JSON unsigned, JWS signed, or JWE encrypted form of the referenced vCon"
+    },
+    "encoding": {
+      "type": "string",
+      "const": "json",
+      "description": "Encoding of the vCon body; MUST be 'json'"
+    },
+    "url": {
+      "type": "string",
+      "description": "HTTPS URL of the externally referenced vCon"
+    },
+    "content_hash": {
+      "$ref": "#/$defs/ContentHash",
+      "description": "Hash(es) of the externally referenced vCon content"
+    }
+  },
+  "$defs": {
+    "ContentHash": {
+      "description": "Single hash token or array of hash tokens for externally referenced content",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
+    }
+  }
+}

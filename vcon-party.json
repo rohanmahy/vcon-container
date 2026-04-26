@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vcon-party.json",
+  "title": "vCon Party Object",
+  "description": "Identity, contact information, and metadata for a party to the conversation",
+  "type": "object",
+  "properties": {
+    "tel": {
+      "type": "string",
+      "description": "TEL URL for the party; 'tel:' scheme prefix is optional"
+    },
+    "stir": {
+      "type": "string",
+      "description": "PASSporT in JWS Compact Serialization form"
+    },
+    "mailto": {
+      "type": "string",
+      "description": "mailto URL for the party; 'mailto:' scheme prefix is optional"
+    },
+    "name": {
+      "type": "string",
+      "description": "Party's name (free-form)"
+    },
+    "validation": {
+      "type": "string",
+      "description": "Token identifying the method used to validate the party's identity; SHOULD be provided when name is provided"
+    },
+    "gmlpos": {
+      "type": "string",
+      "description": "GML pos format latitude and longitude of the party's location at conversation start (same format as gml:pos in RFC4119 PIDF)"
+    },
+    "civicaddress": {
+      "$ref": "#/$defs/CivicaddressObject"
+    },
+    "uuid": {
+      "type": "string",
+      "description": "Unique identifier for the participant; MUST be static across interactions for correlation"
+    },
+    "role": {
+      "type": "string",
+      "description": "Role the participant played in the conversation (e.g. 'agent', 'customer', 'supervisor', 'sme', 'thirdparty')"
+    },
+    "contact_list": {
+      "type": "string",
+      "description": "Label or foreign key reference to the contact list this party was on"
+    }
+  },
+  "$defs": {
+    "CivicaddressObject": {
+      "type": "object",
+      "description": "Civic address information for a party's location as defined in RFC4119 (GEOPRIV); all parameters in lower case",
+      "properties": {
+        "country": { "type": "string" },
+        "a1":      { "type": "string" },
+        "a2":      { "type": "string" },
+        "a3":      { "type": "string" },
+        "a4":      { "type": "string" },
+        "a5":      { "type": "string" },
+        "a6":      { "type": "string" },
+        "prd":     { "type": "string" },
+        "pod":     { "type": "string" },
+        "sts":     { "type": "string" },
+        "hno":     { "type": "string" },
+        "hns":     { "type": "string" },
+        "lmk":     { "type": "string" },
+        "loc":     { "type": "string" },
+        "flr":     { "type": "string" },
+        "nam":     { "type": "string" },
+        "pc":      { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

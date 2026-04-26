@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vcon-analysis.json",
+  "title": "vCon Analysis Object",
+  "description": "Analysis performed on the conversational data",
+  "type": "object",
+  "required": ["type", "vendor"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "description": "Semantic type of analysis data (e.g. 'summary', 'transcript', 'translation', 'sentiment', 'tts')"
+    },
+    "dialog": {
+      "description": "Index or array of indices into the dialog array that this analysis was derived from",
+      "oneOf": [
+        { "type": "integer", "minimum": 0 },
+        { "type": "array", "items": { "type": "integer", "minimum": 0 } }
+      ]
+    },
+    "mediatype": {
+      "type": "string",
+      "description": "MIME media type of the analysis file"
+    },
+    "filename": {
+      "type": "string",
+      "description": "Original filename of the analysis data file"
+    },
+    "vendor": {
+      "type": "string",
+      "description": "Vendor or product name of the software that generated the analysis"
+    },
+    "product": {
+      "type": "string",
+      "description": "Product name to differentiate from other products by the same vendor"
+    },
+    "schema": {
+      "type": "string",
+      "description": "Token or label for the data format or schema of the analysis data"
+    },
+    "body": {
+      "type": "string",
+      "description": "Inline analysis content"
+    },
+    "encoding": {
+      "type": "string",
+      "enum": ["base64url", "json", "none"],
+      "description": "Encoding applied to the body parameter"
+    },
+    "url": {
+      "type": "string",
+      "description": "HTTPS URL where the externally referenced analysis file is stored"
+    },
+    "content_hash": {
+      "$ref": "#/$defs/ContentHash",
+      "description": "Hash(es) of the externally referenced analysis content"
+    }
+  },
+  "$defs": {
+    "ContentHash": {
+      "description": "Single hash token or array of hash tokens for externally referenced content",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
+    }
+  }
+}

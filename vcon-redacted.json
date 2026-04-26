@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vcon-redacted.json",
+  "title": "vCon Redacted Object",
+  "description": "Reference to the unredacted or prior less-redacted vCon instance version",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "uuid": {
+      "type": "string",
+      "description": "UUID of the unredacted/prior vCon instance version; absence indicates that version is unavailable"
+    },
+    "type": {
+      "type": "string",
+      "description": "Type of redaction performed relative to the prior vCon instance version"
+    },
+    "body": {
+      "type": "string",
+      "description": "Inline content of the unredacted vCon; MUST be in encrypted form if included"
+    },
+    "encoding": {
+      "type": "string",
+      "enum": ["base64url", "json", "none"],
+      "description": "Encoding of the body parameter"
+    },
+    "url": {
+      "type": "string",
+      "description": "HTTPS URL of the unredacted vCon; access MUST be restricted to authorized parties"
+    },
+    "content_hash": {
+      "$ref": "#/$defs/ContentHash",
+      "description": "Hash(es) of the externally referenced unredacted vCon content"
+    }
+  },
+  "$defs": {
+    "ContentHash": {
+      "description": "Single hash token or array of hash tokens for externally referenced content",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
+    }
+  }
+}

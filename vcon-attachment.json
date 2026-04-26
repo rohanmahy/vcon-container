@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vcon-attachment.json",
+  "title": "vCon Attachment Object",
+  "description": "Ancillary document discussed, presented, referenced, or related to the conversation",
+  "type": "object",
+  "required": ["start", "party", "dialog"],
+  "properties": {
+    "start": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time the attachment was sent or exchanged (RFC3339)"
+    },
+    "party": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Index into the parties array for the party that contributed the attachment"
+    },
+    "mediatype": {
+      "type": "string",
+      "description": "MIME media type of the attachment file"
+    },
+    "filename": {
+      "type": "string",
+      "description": "Original filename of the attachment file"
+    },
+    "body": {
+      "type": "string",
+      "description": "Inline attachment content"
+    },
+    "encoding": {
+      "type": "string",
+      "enum": ["base64url", "json", "none"],
+      "description": "Encoding applied to the body parameter"
+    },
+    "url": {
+      "type": "string",
+      "description": "HTTPS URL where the externally referenced attachment file is stored"
+    },
+    "content_hash": {
+      "$ref": "#/$defs/ContentHash",
+      "description": "Hash(es) of the externally referenced attachment content"
+    },
+    "dialog": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Index into the dialog array identifying the dialog this attachment is part of"
+    }
+  },
+  "$defs": {
+    "ContentHash": {
+      "description": "Single hash token or array of hash tokens for externally referenced content",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
+    }
+  }
+}

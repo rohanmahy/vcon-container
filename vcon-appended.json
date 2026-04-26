@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vcon-appended.json",
+  "title": "vCon Appended Object",
+  "description": "Reference to the prior vCon instance version to which additional data has been appended",
+  "type": "object",
+  "properties": {
+    "uuid": {
+      "type": "string",
+      "description": "UUID of the original/prior vCon instance version"
+    },
+    "body": {
+      "type": "string",
+      "description": "Inline content of the prior vCon instance version"
+    },
+    "encoding": {
+      "type": "string",
+      "enum": ["base64url", "json", "none"],
+      "description": "Encoding of the body parameter"
+    },
+    "url": {
+      "type": "string",
+      "description": "HTTPS URL of the prior vCon instance version"
+    },
+    "content_hash": {
+      "$ref": "#/$defs/ContentHash",
+      "description": "Hash(es) of the externally referenced prior vCon instance content"
+    }
+  },
+  "$defs": {
+    "ContentHash": {
+      "description": "Single hash token or array of hash tokens for externally referenced content",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
+    }
+  }
+}
