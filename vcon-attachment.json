@@ -38,22 +38,13 @@
       "description": "HTTPS URL where the externally referenced attachment file is stored"
     },
     "content_hash": {
-      "$ref": "#/$defs/ContentHash",
+      "$ref": "vcon-schema.json#/$defs/ContentHash",
       "description": "Hash(es) of the externally referenced attachment content"
     },
     "dialog": {
       "type": "integer",
       "minimum": 0,
       "description": "Index into the dialog array identifying the dialog this attachment is part of"
-    }
-  },
-  "$defs": {
-    "ContentHash": {
-      "description": "Single hash token or array of hash tokens for externally referenced content",
-      "oneOf": [
-        { "type": "string" },
-        { "type": "array", "items": { "type": "string" } }
-      ]
     }
   }
 }

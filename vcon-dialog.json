@@ -66,7 +66,7 @@
       "description": "HTTPS URL where the externally referenced dialog file is stored"
     },
     "content_hash": {
-      "$ref": "#/$defs/ContentHash",
+      "$ref": "vcon-schema.json#/$defs/ContentHash",
       "description": "Hash(es) of the externally referenced dialog content"
     },
     "disposition": {
@@ -199,13 +199,6 @@
     }
   ],
   "$defs": {
-    "ContentHash": {
-      "description": "Single hash token or array of hash tokens for externally referenced content",
-      "oneOf": [
-        { "type": "string" },
-        { "type": "array", "items": { "type": "string" } }
-      ]
-    },
     "PartyHistoryObject": {
       "type": "object",
       "description": "Record of a join, drop, hold, or mute event for a party during a dialog",
