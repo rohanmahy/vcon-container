@@ -4,7 +4,6 @@
   "title": "vCon Attachment Object",
   "description": "Ancillary document discussed, presented, referenced, or related to the conversation",
   "type": "object",
-  "required": ["start", "party", "dialog"],
   "properties": {
     "start": {
       "type": "string",
@@ -46,5 +45,35 @@
       "minimum": 0,
       "description": "Index into the dialog array identifying the dialog this attachment is part of"
     }
-  }
+  },
+  "oneOf": [
+    {
+      "not": {
+        "anyOf": [
+          { "required": ["body"] },
+          { "required": ["encoding"] },
+          { "required": ["url"] },
+          { "required": ["content_hash"] }
+        ]
+      }
+    },
+    {
+      "required": ["body", "encoding"],
+      "not": {
+        "anyOf": [
+          { "required": ["url"] },
+          { "required": ["content_hash"] }
+        ]
+      }
+    },
+    {
+      "required": ["url", "content_hash"],
+      "not": {
+        "anyOf": [
+          { "required": ["body"] },
+          { "required": ["encoding"] }
+        ]
+      }
+    }
+  ]
 }

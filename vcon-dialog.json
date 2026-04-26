@@ -4,7 +4,7 @@
   "title": "vCon Dialog Object",
   "description": "A segment of captured conversation (text, audio, video, transfer record, or incomplete attempt)",
   "type": "object",
-  "required": ["type", "start"],
+  "required": ["type"],
   "properties": {
     "type": {
       "type": "string",
@@ -198,6 +198,36 @@
       }
     }
   ],
+  "oneOf": [
+    {
+      "not": {
+        "anyOf": [
+          { "required": ["body"] },
+          { "required": ["encoding"] },
+          { "required": ["url"] },
+          { "required": ["content_hash"] }
+        ]
+      }
+    },
+    {
+      "required": ["body", "encoding"],
+      "not": {
+        "anyOf": [
+          { "required": ["url"] },
+          { "required": ["content_hash"] }
+        ]
+      }
+    },
+    {
+      "required": ["url", "content_hash"],
+      "not": {
+        "anyOf": [
+          { "required": ["body"] },
+          { "required": ["encoding"] }
+        ]
+      }
+    }
+  ],
   "$defs": {
     "PartyHistoryObject": {
       "type": "object",
@@ -219,8 +249,7 @@
           "format": "date-time",
           "description": "Date and time of the event (RFC3339)"
         }
-      },
-      "additionalProperties": false
+      }
     }
   }
 }
