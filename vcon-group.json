@@ -26,19 +26,34 @@
       "description": "Hash(es) of the externally referenced vCon content"
     }
   },
-  "allOf": [
+  "oneOf": [
     {
-      "not": { "required": ["body", "url"] }
+      "not": {
+        "anyOf": [
+          { "required": ["body"] },
+          { "required": ["encoding"] },
+          { "required": ["url"] },
+          { "required": ["content_hash"] }
+        ]
+      }
     },
     {
-      "if": { "required": ["body"] },
-      "then": { "required": ["encoding"] },
-      "else": { "not": { "required": ["encoding"] } }
+      "required": ["body", "encoding"],
+      "not": {
+        "anyOf": [
+          { "required": ["url"] },
+          { "required": ["content_hash"] }
+        ]
+      }
     },
     {
-      "if": { "required": ["url"] },
-      "then": { "required": ["content_hash"] },
-      "else": { "not": { "required": ["content_hash"] } }
+      "required": ["url", "content_hash"],
+      "not": {
+        "anyOf": [
+          { "required": ["body"] },
+          { "required": ["encoding"] }
+        ]
+      }
     }
   ]
 }

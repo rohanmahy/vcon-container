@@ -65,6 +65,7 @@
   },
   "not": {
     "anyOf": [
+      { "required": ["redacted", "appended", "group"] },
       { "required": ["redacted", "appended"] },
       { "required": ["redacted", "group"] },
       { "required": ["appended", "group"] }
